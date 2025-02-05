@@ -18,11 +18,7 @@ require("dotenv").config();
 const cors = require("cors");
 const app = (0, express_1.default)();
 app.use(cors());
-const PORT = process.env.PORT || 8000;
 app.use(express_1.default.json());
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
 app.use("/api/v1", customer_1.default);
 app.use("/api/v1", user_1.default);
 app.use("/api/v1", shop_1.default);
