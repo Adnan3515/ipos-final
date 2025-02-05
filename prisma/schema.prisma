@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Role {
+  ADMIN
+  ATTENDANT
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  DISTRIBUTOR
+  OTHERS
+}
+
+enum SupplierType {
+  MANUFACTURER
+  DISTRIBUTOR
+  WHOLESALE
+  RETAILER
+  OTHERS
+}
+
+model Customer {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  customerType   CustomerType
+  firstName      String
+  lastName       String
+  phone          String       @unique
+  gender         Gender
+  country        String
+  location       String
+  maxCreditLimit Float
+  maxCreditDays  Int
+  taxPin         String?
+  dod            DateTime?
+  email          String?      @unique
+  NIN            String?      @unique
+  createdAt      DateTime     @default(now())
+  updateAt       DateTime     @updatedAt
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  username  String    @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String    @unique
+  dob       DateTime?
+  gender    Gender
+  image     String?
+  role      Role      @default(ATTENDANT)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  shops     Shop[]
+}
+
+model Shop {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  slug         String   @unique
+  location     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  adminId      String   @db.ObjectId
+  admin        User     @relation(fields: [adminId], references: [id])
+  attendantIds String[] @db.ObjectId
+}
+
+model Supplier {
+  id                String       @id @default(auto()) @map("_id") @db.ObjectId
+  supplierType      SupplierType
+  name              String
+  contactPerson     String
+  phone             String       @unique
+  email             String?      @unique
+  location          String
+  country           String
+  website           String?
+  taxPin            String?
+  regNumber         String?      @unique
+  bankAccountNumber String?
+  bankName          String?
+  paymentTerms      String?
+  logo              String?      @default("http://adnanfaizanpvt.com.pk/img/icon/favicon.png")
+  rating            Float?
+  notes             String?
+  products          Product[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Unit {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  abbreviation String
+  slug         String    @unique
+  products     Product[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Brand {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  batchNumber String?
+  image       String?  @default("http://adnanfaizanpvt.com.pk/img/icon/favicon.png")
+  alertQty    Int
+  stockQty    Int
+  price       Int
+  buyingPrice Int
+  sku         String   @unique
+  productCode String   @unique
+  slug        String   @unique
+  supplierId  String   @db.ObjectId
+  unitId      String   @db.ObjectId
+  brandId     String   @db.ObjectId
+  categoryId  String   @db.ObjectId
+  expiryDate  DateTime? @default(now())
+  unit        Unit     @relation(fields: [unitId], references: [id])
+  brand       Brand    @relation(fields: [brandId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+  supplier    Supplier @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
