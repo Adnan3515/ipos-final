@@ -18,13 +18,17 @@ require("dotenv").config();
 const cors = require("cors");
 const app = (0, express_1.default)();
 app.use(cors());
+const PORT = process.env.PORT || 8000;
 app.use(express_1.default.json());
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 app.use("/api/v1", customer_1.default);
 app.use("/api/v1", user_1.default);
 app.use("/api/v1", shop_1.default);
 app.use("/api/v1", supplier_1.default);
 app.use("/api/v1", login_1.default);
-app.use("/api/v1", unit_1.default);
+app.use("/", unit_1.default);
 app.use("/api/v1", brands_1.default);
 app.use("/api/v1", categories_1.default);
 app.use("/api/v1", products_1.default);
